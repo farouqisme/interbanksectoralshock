@@ -1,4 +1,3 @@
-install.packages("usethis")
 library(plyr)
 library(tidyverse)
 library(dplyr)
@@ -8,7 +7,6 @@ library(ggplot2)
 library(writexl)
 library(usethis)
 
-?use_github
 setwd("E:/KULIAH!/SEMESTER 7/Wekmon/Replication Paper/DAta")
 getwd()
 
