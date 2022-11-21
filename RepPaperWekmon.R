@@ -1,3 +1,5 @@
+install.packages("urca")
+install.packages("tseries")
 library(plyr)
 library(tidyverse)
 library(dplyr)
@@ -6,7 +8,8 @@ library(Hmisc)
 library(ggplot2)
 library(writexl)
 library(usethis)
-
+library(urca)
+library(tseries)
 setwd("E:/KULIAH!/SEMESTER 7/Wekmon/Replication Paper/DAta")
 getwd()
 
@@ -63,7 +66,26 @@ ggplot(data=rep1, aes(x=period)) +
 
 
 
-########----------------------------------Data cleaning finished
+########----------------------------------Data analysis
 
-##
+#######stationarity test
+##observing data's stationarity using plot
+ts.plot(rep1$pdb)
+ts.plot(rep1$agri)
+ts.plot(rep1$man)
+ts.plot(rep1$jasa)
+ts.plot(rep1$int)
+
+
+#ADF
+adf.test(rep1$pdbr)
+adf.test(rep1$agri)
+adf.test(rep1$man)
+adf.test(rep1$jasa)
+adf.test(rep1$nex)
+adf.test(rep1$cpi_per)
+adf.test(rep1$int)
+#PP
+PP.test(rep1$pdbr)
+
 
