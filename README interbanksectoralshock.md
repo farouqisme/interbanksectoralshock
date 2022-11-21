@@ -1,2 +1,4 @@
 ##README interbanksectoralshock 
-this repository is created to documenting Rscript for "replicate paper"
+
+
+this repository is created for documenting the Rscript of the paper replication
