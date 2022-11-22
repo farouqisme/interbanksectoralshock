@@ -1,4 +1,4 @@
-install.packages("zoo")
+
 library(plyr)
 library(tidyverse)
 library(dplyr)
@@ -70,29 +70,24 @@ ggplot(data=rep1, aes(x=period)) +
 
 ##change data into time-series
 
-#rep1$kuartal <- yq(rep1$kuartal)
-
-//////problems
-rep2 <- xts(rep1, 
-            order.by = rep1$kuartal,
-            frequency = 4,
-            unique = T)
-
+rep1 <- rep1[-1]
+rep2 <- ts(rep1, frequency = 4, start = c(2000,1))
+plot(rep2[,"pdbr"])
 
 
 ########----------------------------------Data analysis
 
 #######stationarity test
 ##observing data's stationarity using plot
-ts.plot(rep2$pdbr)
-ts.plot(rep2$agri)
-ts.plot(rep2$man)
-ts.plot(rep2$jasa)
-ts.plot(rep2$nex)
-ts.plot(rep2$cpi)
-ts.plot(rep2$int)
+ts.plot(rep2[,"pdbr"])
+ts.plot(rep2[,"agri"])
+ts.plot(rep2[,"man"])
+ts.plot(rep2[,"jasa"])
+ts.plot(rep2[,"nex"])
+ts.plot(rep2[,"cpi"])
+ts.plot(rep2[,"int"])
 
-##stationarity test using ADF & PP
+##stationarity test using ADF & PP & find the best data generating process
 x <- subset(rep1, select = c(pdbr, agri, man, jasa, int, nex, cpi_per))
 y <- list()
 
@@ -103,14 +98,10 @@ adf <- append(adf, pp)
 y <- append(y, list(adf))
 }
 
-
-
-
-
-
 #seasonality
-/////problems
-decompose(rep2$pdbr)
+agri.stl <- rep2[,"agri"] %>% stl(t.window = 4, s.window = "periodic")
+pdbr.stl <- rep2[,"pdbr"] %>% stl(t.window = 4, s.window = "periodic")
+plot(pdbr.stl)
+plot(agri.stl)
 
-stl(rep2$pdbr, s.window = "period",
-    t.window = 4)
+acf(rep2[,"pdbr"])
