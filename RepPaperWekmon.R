@@ -1,5 +1,8 @@
 install.packages("urca")
 install.packages("tseries")
+install.packages("lubridate")
+install.packages("tsbox")
+install.packages("xts")
 library(plyr)
 library(tidyverse)
 library(dplyr)
@@ -10,6 +13,9 @@ library(writexl)
 library(usethis)
 library(urca)
 library(tseries)
+library(lubridate)
+library(tsbox)
+library(xts)
 setwd("E:/KULIAH!/SEMESTER 7/Wekmon/Replication Paper/DAta")
 getwd()
 
@@ -64,16 +70,28 @@ ggplot(data=rep1, aes(x=period)) +
   geom_line(aes(y=pdbr),  color = "darkred") +
   geom_line(aes(y=pdb),  color = "steelblue", linetype = "twodash")
 
+##change data into time-series
 
+class(rep1$kuartal)
+rep1$kuartal <- yq(rep1$kuartal)
+class(rep1$kuartal)
 
+rep2 <- xts(rep1, rep1$kuartal)
+class(rep2$jasa)
+rep2 <- xts( rep, order.by= as.Date(rep2$kuartal))
 ########----------------------------------Data analysis
 
 #######stationarity test
 ##observing data's stationarity using plot
-ts.plot(rep1$pdb)
+##x <- subset(rep1, select = c(pdbr, agri, man, jasa, int, nex, cpi_per))
+
+
+
 ts.plot(rep1$agri)
 ts.plot(rep1$man)
 ts.plot(rep1$jasa)
+ts.plot(rep1$nex)
+ts.plot(rep1$cpi)
 ts.plot(rep1$int)
 
 
@@ -85,6 +103,8 @@ adf.test(rep1$jasa)
 adf.test(rep1$nex)
 adf.test(rep1$cpi_per)
 adf.test(rep1$int)
+
+
 #PP
 PP.test(rep1$pdbr)
 PP.test(rep1$agri)
@@ -93,3 +113,6 @@ pp.test(rep1$jasa)
 pp.test(rep1$nex)
 pp.test(rep1$cpi_per)
 pp.test(rep1$int)
+
+#seasonality
+
