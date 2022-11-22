@@ -79,40 +79,40 @@ class(rep1$kuartal)
 rep2 <- xts(rep1, rep1$kuartal)
 class(rep2$jasa)
 rep2 <- xts( rep, order.by= as.Date(rep2$kuartal))
+class(rep2$pdbr)
+
 ########----------------------------------Data analysis
 
 #######stationarity test
 ##observing data's stationarity using plot
 ##x <- subset(rep1, select = c(pdbr, agri, man, jasa, int, nex, cpi_per))
 
-
-
-ts.plot(rep1$agri)
-ts.plot(rep1$man)
-ts.plot(rep1$jasa)
-ts.plot(rep1$nex)
-ts.plot(rep1$cpi)
-ts.plot(rep1$int)
+ts.plot(rep2$pdbr)
+ts.plot(rep2$agri)
+ts.plot(rep2$man)
+ts.plot(rep2$jasa)
+ts.plot(rep2$nex)
+ts.plot(rep2$cpi)
+ts.plot(rep2$int)
 
 
 #ADF
-adf.test(rep1$pdbr)
-adf.test(rep1$agri)
-adf.test(rep1$man)
-adf.test(rep1$jasa)
-adf.test(rep1$nex)
-adf.test(rep1$cpi_per)
-adf.test(rep1$int)
+adf.test(rep2$pdbr)
+adf.test(rep2$agri)
+adf.test(rep2$man)
+adf.test(rep2$jasa)
+adf.test(rep2$nex)
+adf.test(rep2$cpi_per)
+adf.test(rep2$int)
 
 
 #PP
-PP.test(rep1$pdbr)
-PP.test(rep1$agri)
-pp.test(rep1$man)
-pp.test(rep1$jasa)
-pp.test(rep1$nex)
-pp.test(rep1$cpi_per)
-pp.test(rep1$int)
+PP.test(rep2$pdbr)
+PP.test(rep2$agri)
+pp.test(rep2$man)
+pp.test(rep2$jasa)
+pp.test(rep2$nex)
+pp.test(rep2$cpi_per)
+pp.test(rep2$int)
 
 #seasonality
-
