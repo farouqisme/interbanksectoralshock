@@ -1,8 +1,4 @@
-install.packages("urca")
-install.packages("tseries")
-install.packages("lubridate")
-install.packages("tsbox")
-install.packages("xts")
+install.packages("zoo")
 library(plyr)
 library(tidyverse)
 library(dplyr)
@@ -16,6 +12,8 @@ library(tseries)
 library(lubridate)
 library(tsbox)
 library(xts)
+library(zoo)
+
 setwd("E:/KULIAH!/SEMESTER 7/Wekmon/Replication Paper/DAta")
 getwd()
 
@@ -72,21 +70,20 @@ ggplot(data=rep1, aes(x=period)) +
 
 ##change data into time-series
 
-class(rep1$kuartal)
-rep1$kuartal <- yq(rep1$kuartal)
-class(rep1$kuartal)
+#rep1$kuartal <- yq(rep1$kuartal)
 
-rep2 <- xts(rep1, rep1$kuartal)
-class(rep2$jasa)
-rep2 <- xts( rep, order.by= as.Date(rep2$kuartal))
-class(rep2$pdbr)
+//////problems
+rep2 <- xts(rep1, 
+            order.by = rep1$kuartal,
+            frequency = 4,
+            unique = T)
+
+
 
 ########----------------------------------Data analysis
 
 #######stationarity test
 ##observing data's stationarity using plot
-##x <- subset(rep1, select = c(pdbr, agri, man, jasa, int, nex, cpi_per))
-
 ts.plot(rep2$pdbr)
 ts.plot(rep2$agri)
 ts.plot(rep2$man)
@@ -95,24 +92,25 @@ ts.plot(rep2$nex)
 ts.plot(rep2$cpi)
 ts.plot(rep2$int)
 
+##stationarity test using ADF & PP
+x <- subset(rep1, select = c(pdbr, agri, man, jasa, int, nex, cpi_per))
+y <- list()
 
-#ADF
-adf.test(rep2$pdbr)
-adf.test(rep2$agri)
-adf.test(rep2$man)
-adf.test(rep2$jasa)
-adf.test(rep2$nex)
-adf.test(rep2$cpi_per)
-adf.test(rep2$int)
+for (i in x){
+adf <- list(adf.test(i))
+pp <- list(pp.test(i))
+adf <- append(adf, pp)
+y <- append(y, list(adf))
+}
 
 
-#PP
-PP.test(rep2$pdbr)
-PP.test(rep2$agri)
-pp.test(rep2$man)
-pp.test(rep2$jasa)
-pp.test(rep2$nex)
-pp.test(rep2$cpi_per)
-pp.test(rep2$int)
+
+
+
 
 #seasonality
+/////problems
+decompose(rep2$pdbr)
+
+stl(rep2$pdbr, s.window = "period",
+    t.window = 4)
