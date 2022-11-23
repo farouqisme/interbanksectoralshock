@@ -1,5 +1,4 @@
 
-library(plyr)
 library(tidyverse)
 library(dplyr)
 library(readxl)
@@ -13,7 +12,7 @@ library(lubridate)
 library(tsbox)
 library(xts)
 library(zoo)
-
+library(vars)
 setwd("E:/KULIAH!/SEMESTER 7/Wekmon/Replication Paper/DAta")
 getwd()
 
@@ -36,9 +35,6 @@ pdbs <- pdbsektlong %>% group_by(kuartal) %>% summarise(pdb = sum(pdb1))
 
 pdbf <- left_join(pdbsekt, pdbs)
 
-pdbf$period <- c(1:91)
-
-
 ##visualise
 ggplot(data=pdbf, aes(x=period, y=pdb, group = 1)) + geom_line()
 
@@ -53,10 +49,6 @@ rep1$agri <- rep1$agri/rep1$cpi_per
 rep1$man <- rep1$agri/rep1$cpi_per
 rep1$jasa <- rep1$jasa/rep1$cpi_per
 
-
-##divides into 2 periods.
-rep1$subsample <- ifelse(rep1$period <= 48, 0, 1)
-
 ##gen var aggregate production (excluding the sector under consideration)
 
 rep1 <- rep1 %>% group_by(kuartal) %>% mutate(agrimin = sum(man, jasa))
@@ -70,9 +62,11 @@ ggplot(data=rep1, aes(x=period)) +
 
 ##change data into time-series
 
-rep1 <- rep1[-1]
-rep2 <- ts(rep1, frequency = 4, start = c(2000,1))
-plot(rep2[,"pdbr"])
+datafix <- subset(rep1, select = 
+                    c(pdbr, agri, man, jasa, int, 
+                      nex, cpi_per, agrimin, manmin, jasamin))
+
+rep2 <- ts(datafix, frequency = 4, start = c(2000,1))
 
 
 ########----------------------------------Data analysis
@@ -87,15 +81,35 @@ ts.plot(rep2[,"nex"])
 ts.plot(rep2[,"cpi"])
 ts.plot(rep2[,"int"])
 
-##stationarity test using ADF & PP & find the best data generating process
-x <- subset(rep1, select = c(pdbr, agri, man, jasa, int, nex, cpi_per))
-y <- list()
+##stationarity test using ADF & PP
 
-for (i in x){
-adf <- list(adf.test(i))
-pp <- list(pp.test(i))
-adf <- append(adf, pp)
-y <- append(y, list(adf))
+pptest <- NULL
+for (i in 1:ncol(rep2)){
+  pp <- pp.test(rep2[,i])
+  pptest <- rbind(pptest,pp$p.value)
+  }
+adftest <- NULL
+for (i in 1:ncol(rep2)){
+  adf <- adf.test(rep2[,i])
+  adftest <- rbind(adftest,adf$p.value)
+}
+
+statest <- cbind(pptest, adftest)
+
+
+
+
+
+
+#lag length
+VARselect(rep2[,"pdbr"], lag.max = 4)
+VARselect(rep2[,"agri"], lag.max = 4)
+VARselect(rep2[,"man"], lag.max = 4)
+VARselect(rep2[,"jasa"], lag.max = 4)
+optlag <- NULL
+for (i in 1:ncol(rep2){
+  
+  
 }
 
 #seasonality
