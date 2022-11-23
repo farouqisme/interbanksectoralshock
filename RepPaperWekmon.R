@@ -78,16 +78,17 @@ ts.plot(rep2[,"agri"])
 ts.plot(rep2[,"man"])
 ts.plot(rep2[,"jasa"])
 ts.plot(rep2[,"nex"])
-ts.plot(rep2[,"cpi"])
+ts.plot(rep2[,"cpi_per"])
 ts.plot(rep2[,"int"])
 
-##stationarity test using ADF & PP
+##stationarity test using ADF & PP (level)
 
 pptest <- NULL
 for (i in 1:ncol(rep2)){
   pp <- pp.test(rep2[,i])
   pptest <- rbind(pptest,pp$p.value)
-  }
+}
+
 adftest <- NULL
 for (i in 1:ncol(rep2)){
   adf <- adf.test(rep2[,i])
@@ -96,21 +97,33 @@ for (i in 1:ncol(rep2)){
 
 statest <- cbind(pptest, adftest)
 
-
-
-
-
-
-#lag length
-VARselect(rep2[,"pdbr"], lag.max = 4)
-VARselect(rep2[,"agri"], lag.max = 4)
-VARselect(rep2[,"man"], lag.max = 4)
-VARselect(rep2[,"jasa"], lag.max = 4)
-optlag <- NULL
-for (i in 1:ncol(rep2){
-  
-  
+##stationarity test using ADF & PP (first diff)
+pptestdiff <- NULL
+for (i in 1:ncol(rep2)){
+  pp <- pp.test(diff(rep2[,i]))
+  pptestdiff <- rbind(pptestdiff,pp$p.value)
 }
+
+adftestdiff <- NULL
+for (i in 1:ncol(rep2)){
+  adf <- adf.test(diff(rep2[,i]))
+  adftestdiff <- rbind(adftestdiff,adf$p.value)
+}
+
+statestdiff <- cbind(pptestdiff, adftestdiff)
+
+
+
+#optimal lag length
+
+optlag <- NULL
+for (i in 1:ncol(rep2)){
+  testlag <- VARselect(rep2[,i], lag.max = 4)
+  optlag <- rbind(optlag, testlag$selection)
+}
+
+
+
 
 #seasonality
 agri.stl <- rep2[,"agri"] %>% stl(t.window = 4, s.window = "periodic")
