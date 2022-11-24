@@ -113,16 +113,17 @@ for (i in 1:ncol(rep2)){
 statestdiff <- cbind(pptestdiff, adftestdiff)
 
 
-
 #optimal lag length
-
 optlag <- NULL
 for (i in 1:ncol(rep2)){
   testlag <- VARselect(rep2[,i], lag.max = 4)
   optlag <- rbind(optlag, testlag$selection)
 }
 
+stationarity <- as.data.frame(cbind(statest,statestdiff))
 
+
+#cointegration test
 
 
 #seasonality
