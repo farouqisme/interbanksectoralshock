@@ -1,4 +1,3 @@
-
 library(tidyverse)
 library(dplyr)
 library(readxl)
@@ -69,32 +68,6 @@ datafix <- subset(rep1, select =
 rep2 <- ts(datafix, frequency = 4, start = c(2000,1))
 #write_xlsx(rep2,"datainit.xlsx")
 
-##divide into several groups of data
-
-#GDP
-gdp <- subset(rep2, select =
-                c(pdbr, cpi_per, 
-                  nex, int))
-
-#Agri
-agri <- subset(rep2, select =
-                c(agrimin, cpi_per, 
-                  agri, nex, int))
-
-#Man
-man <- subset(rep2, select =
-                 c(manmin, cpi_per, 
-                   man, nex, int))
-
-#Jasa
-serv <- subset(rep2, select =
-                c(jasamin, cpi_per, 
-                  jasa, nex, int))
-
-
-
-########----------------------------------Data analysis
-
 #######stationarity test
 ##observing data's stationarity using plot
 ts.plot(rep2[,"pdbr"])
@@ -106,7 +79,6 @@ ts.plot(rep2[,"cpi_per"])
 ts.plot(rep2[,"int"])
 
 ##stationarity test using ADF & PP (level)
-
 pptest <- NULL
 for (i in 1:ncol(rep2)){
   pp <- pp.test(rep2[,i])
@@ -120,6 +92,7 @@ for (i in 1:ncol(rep2)){
 }
 
 statest <- cbind(pptest, adftest)
+
 
 ##stationarity test using ADF & PP (first diff)
 pptestdiff <- NULL
@@ -137,6 +110,51 @@ for (i in 1:ncol(rep2)){
 statestdiff <- cbind(pptestdiff, adftestdiff)
 
 
+#######seasonality test
+seasonalize <- NULL
+for (i in 1:ncol(rep2)){
+  stl.dec <-  rep2[,i] %>% stl(t.window = 4, s.window = "periodic")
+  seasonalize <- cbind(seasonalize, stl.dec$time.series[,2])
+}
+
+##naming the variables
+for (i in 1:ncol(seasonalize)){
+  rename(seasonalize, i = c(pdbr, agri, man, jasa, int, nex, cpi_per,
+                            agrimin, manmin, jasamin))
+}
+
+##divide into several groups of data
+
+#GDP
+gdp <- subset(rep2, select =
+                c(pdbr, cpi_per, 
+                  nex, int))
+gdp <- ts(gdp, frequency = 4, start = c(2000,1))
+
+
+
+#Agri
+agri <- subset(rep2, select =
+                c(agrimin, cpi_per, 
+                  agri, nex, int))
+agri <- ts(agri, frequency = 4, start = c(2000,1))
+
+#Man
+man <- subset(rep2, select =
+                 c(manmin, cpi_per, 
+                   man, nex, int))
+man <- ts(man, frequency = 4, start = c(2000,1))
+
+#Jasa
+serv <- subset(rep2, select =
+                c(jasamin, cpi_per, 
+                  jasa, nex, int))
+serv <- ts(serv, frequency = 4, start = c(2000,1))
+
+########----------------------------------Data analysis
+
+
+
 #optimal lag length
 optlag <- NULL
 for (i in 1:ncol(rep2)){
@@ -147,14 +165,47 @@ for (i in 1:ncol(rep2)){
 stationarity <- as.data.frame(cbind(statest,statestdiff))
 ##write_xlsx(stationarity,"statest.xlsx")
 
+#gdp
+gdplag <- NULL
+for (i in 1:ncol(gdp)){
+  gdptest <- VARselect(gdp, lag.max = 4)
+  gdplag <- rbind(gdplag, gdptest$selection)
+}
+
+
+#agri
+agrilag <- NULL
+for (i in 1:ncol(agri)){
+  agritest <- VARselect(agri, lag.max = 4)
+  agrilag <- rbind(agrilag, agritest$selection)
+}
+
+#man
+manlag <- NULL
+for (i in 1:ncol(man)){
+  mantest <- VARselect(man, lag.max = 4)
+  manlag <- rbind(manlag, mantest$selection)
+}
+
+#jasa
+servlag <- NULL
+for (i in 1:ncol(serv)){
+  servtest <- VARselect(serv, lag.max = 4)
+  servlag <- rbind(servlag, servtest$selection)
+}
+
 
 #cointegration test
+gdp.co <- ca.jo(gdp, type = "trace", K = 3, season = 4)
+summary(gdp.co)
+
+agri.co <- ca.jo(agri, type = "trace", K = 4, season = 4)
+summary(agri.co)
+
+man.co <- ca.jo(man, type = "trace", K = 4, season = 4)
+summary(man.co)
+
+serv.co <- ca.jo(serv, type = "trace", K = 4)
+summary(serv.co)
 
 
-#seasonality
-agri.stl <- rep2[,"agri"] %>% stl(t.window = 4, s.window = "periodic")
-pdbr.stl <- rep2[,"pdbr"] %>% stl(t.window = 4, s.window = "periodic")
-plot(pdbr.stl)
-plot(agri.stl)
-
-acf(rep2[,"pdbr"])
