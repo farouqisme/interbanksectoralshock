@@ -67,6 +67,30 @@ datafix <- subset(rep1, select =
                       nex, cpi_per, agrimin, manmin, jasamin))
 
 rep2 <- ts(datafix, frequency = 4, start = c(2000,1))
+#write_xlsx(rep2,"datainit.xlsx")
+
+##divide into several groups of data
+
+#GDP
+gdp <- subset(rep2, select =
+                c(pdbr, cpi_per, 
+                  nex, int))
+
+#Agri
+agri <- subset(rep2, select =
+                c(agrimin, cpi_per, 
+                  agri, nex, int))
+
+#Man
+man <- subset(rep2, select =
+                 c(manmin, cpi_per, 
+                   man, nex, int))
+
+#Jasa
+serv <- subset(rep2, select =
+                c(jasamin, cpi_per, 
+                  jasa, nex, int))
+
 
 
 ########----------------------------------Data analysis
@@ -121,6 +145,7 @@ for (i in 1:ncol(rep2)){
 }
 
 stationarity <- as.data.frame(cbind(statest,statestdiff))
+##write_xlsx(stationarity,"statest.xlsx")
 
 
 #cointegration test
