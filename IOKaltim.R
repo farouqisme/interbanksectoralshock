@@ -25,18 +25,3 @@ sakernas <- sakernas %>% group_by(sektor) %>%
   mutate(wgaji = wm*gaji) 
 sakernas2 <- sakernas %>% group_by(sektor) %>%
   summarise(labor = sum(weight), sal = sum(wgaji))
-
-
-
-
-
-sakernas %>% 
-  select(sektor, berat, weight, wm, gaji, wgaji) %>% arrange(sektor) %>% view()
-
-
-
-
-sakernas3 <- sakernas %>% group_by(sektor) %>%
-       summarise(jumlah = sum(B5_R26A))
-
-?summarise
