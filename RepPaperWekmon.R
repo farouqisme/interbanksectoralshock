@@ -208,4 +208,5 @@ summary(man.co)
 serv.co <- ca.jo(serv, type = "trace", K = 4)
 summary(serv.co)
 
+ss
 
