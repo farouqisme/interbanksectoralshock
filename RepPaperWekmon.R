@@ -77,9 +77,11 @@ datafix <- subset(rep1, select =
                     c(pdbr, agri, man, jasa, int, 
                       nex, cpi_per, agrimin, manmin, jasamin))
 
-rep2 <- ts(datafix, frequency = 4, start = c(2000,1))
-#write_xlsx(rep2,"datainit.xlsx")
 
+rep2 <- ts(datafix, frequency = 4, start = c(2000,1))
+
+
+##/////////////////////////////////////##FULL SAMPLE##/////////////////////////////////////##
 #######stationarity test
 ##observing data's stationarity using plot
 ts.plot(rep2[,"pdbr"])
@@ -233,7 +235,9 @@ plot(irf(vargdp, impulse = "int", response = "nex", boot = T, cumulative = FALSE
 plot(irf(vargdp, impulse = "int", response = "int", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
 fevd(vargdp, n.ahead = 24)
 
-
+##untuk nangkep irf
+##irfgdp <- irf(vargdp, impulse = "int", response = "pdbr", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
+##irfgdp$irf
 
 varagri <- VAR(agri, p = 4, type = "const", season = NULL, exogen = NULL)
 plot(irf(varagri, impulse = "int", response = "agri", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
@@ -248,3 +252,72 @@ plot(irf(varserv, impulse = "int", response = "jasa", boot = T, cumulative = FAL
 
 
 
+##/////////////////////////////////////##SUBSAMPLE##/////////////////////////////////////##
+##divide full sample seasonalized data to 2 sub-sample 
+
+sub1 <- head(rep3, 45)
+sub2 <- tail(rep3, 46)
+
+
+############SUBSAMPLE 1###########
+gdp1 <- subset(sub1, select =
+                c(pdbr, cpi_per, 
+                  nex, int))
+gdp1 <- ts(gdp1, frequency = 4, start = c(2000,1))
+
+#Agri
+agri1 <- subset(sub1, select =
+                 c(agrimin, cpi_per, 
+                   agri, nex, int))
+agri1 <- ts(agri1, frequency = 4, start = c(2000,1))
+
+#Man
+man1 <- subset(sub1, select =
+                c(manmin, cpi_per, 
+                  man, nex, int))
+man1 <- ts(man1, frequency = 4, start = c(2000,1))
+
+#Jasa
+serv1 <- subset(sub1, select =
+                 c(jasamin, cpi_per, 
+                   jasa, nex, int))
+serv1 <- ts(serv1, frequency = 4, start = c(2000,1))
+
+
+##VAR Analysis
+vargdp1 <- VAR(gdp1, p = 4, type = "const", season = NULL, exogen = NULL)
+varagri1 <- VAR(agri1, p = 4, type = "const", season = NULL, exogen = NULL)
+varman1 <- VAR(man1, p = 4, type = "const", season = NULL, exogen = NULL)
+varserv1 <- VAR(serv1, p = 4, type = "const", season = NULL, exogen = NULL)
+
+
+############SUBSAMPLE 2###########
+gdp2 <- subset(sub2, select =
+                 c(pdbr, cpi_per, 
+                   nex, int))
+gdp2 <- ts(gdp2, frequency = 4, start = c(2000,1))
+
+#Agri
+agri2 <- subset(sub2, select =
+                  c(agrimin, cpi_per, 
+                    agri, nex, int))
+agri2 <- ts(agri2, frequency = 4, start = c(2000,1))
+
+#Man
+man2 <- subset(sub2, select =
+                 c(manmin, cpi_per, 
+                   man, nex, int))
+man2 <- ts(man2, frequency = 4, start = c(2000,1))
+
+#Jasa
+serv2 <- subset(sub2, select =
+                  c(jasamin, cpi_per, 
+                    jasa, nex, int))
+serv2 <- ts(serv2, frequency = 4, start = c(2000,1))
+
+
+##VAR Analysis
+vargdp2 <- VAR(gdp2, p = 4, type = "const", season = NULL, exogen = NULL)
+varagri2 <- VAR(agri2, p = 4, type = "const", season = NULL, exogen = NULL)
+varman2 <- VAR(man2, p = 4, type = "const", season = NULL, exogen = NULL)
+varserv2 <- VAR(serv2, p = 4, type = "const", season = NULL, exogen = NULL)
