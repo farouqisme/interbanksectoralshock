@@ -12,6 +12,7 @@ library(tsbox)
 library(xts)
 library(zoo)
 library(vars)
+library(stargazer)
 setwd("E:/KULIAH!/SEMESTER 7/Wekmon/Replication Paper/DAta")
 getwd()
 
@@ -226,28 +227,49 @@ summary(serv.co)
 
 #VAR analysis
 
+####################GDP
 vargdp <- VAR(gdp, p = 4, type = "const", season = NULL, exogen = NULL)
 serialvargdp <- serial.test(vargdp, lags.pt = 12, type = "PT.adjusted")
 
-plot(irf(vargdp, impulse = "int", response = "pdbr", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
-plot(irf(vargdp, impulse = "int", response = "cpi_per", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
-plot(irf(vargdp, impulse = "int", response = "nex", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
-plot(irf(vargdp, impulse = "int", response = "int", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
-fevd(vargdp, n.ahead = 24)
+irfgdp <- irf(vargdp, impulse = "int", response = "pdbr", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
+irfcpi <- irf(vargdp, impulse = "int", response = "cpi_per", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
+irfnex <- irf(vargdp, impulse = "int", response = "nex", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
+irfint <- irf(vargdp, impulse = "int", response = "int", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
 
-##untuk nangkep irf
-##irfgdp <- irf(vargdp, impulse = "int", response = "pdbr", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
-##irfgdp$irf
+plot(irfgdp, xlab = "", ylab = "", main = "GDP")
+plot(irfcpi, xlab = "", ylab = "", main = "CPI")
+plot(irfnex, xlab = "", ylab = "", main = "NEX")
+plot(irfint, xlab = "", ylab = "", main = "INT")
 
+
+####################Sectoral
 varagri <- VAR(agri, p = 4, type = "const", season = NULL, exogen = NULL)
-plot(irf(varagri, impulse = "int", response = "agri", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
-
-
 varman <- VAR(man, p = 4, type = "const", season = NULL, exogen = NULL)
-plot(irf(varman, impulse = "int", response = "man", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
-
 varserv <- VAR(serv, p = 4, type = "const", season = NULL, exogen = NULL)
-plot(irf(varserv, impulse = "int", response = "jasa", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95))
+
+
+irfagri <- irf(varagri, impulse = "int", response = "agri", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
+irfman <- irf(varman, impulse = "int", response = "man", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
+irfjasa <- irf(varserv, impulse = "int", response = "jasa", boot = T, cumulative = FALSE, n.ahead = 50, ci=0.95)
+
+###perbandingan FEVD
+fevdgdp <- fevd(vargdp, n.ahead = 24)
+fevdagri <- fevd(varagri, n.ahead = 24)
+fevdman <- fevd(varman, n.ahead = 24)
+fevdserv <- fevd(varserv, n.ahead = 24)
+
+fevdtot <- data.frame(fevdgdp$int, fevdagri$int, fevdman$int, fevdserv$int)
+fevdtot <- fevdtot %>% subset( , c(pdbr, agri, man, jasa))
+#write_xlsx(fevdtot, "fevdsec.xlsx")
+
+###plotting IRF (BELUM SOLVED)
+irftotal <- data.frame(irfgdp$irf$int, irfagri$irf$int, irfman$irf$int, irfjasa$irf$int)
+irftotal$x <- seq(1,51)
+ggplot(data=irftotal, aes(x=x)) +
+  geom_line(aes(y=pdbr), linetype = "solid")+
+  geom_line(aes(y=jasa), linetype = "dashed")+
+  labs(x = "horizons", y = "response")+
+  theme_classic()
 
 
 
@@ -290,6 +312,13 @@ varagri1 <- VAR(agri1, p = 4, type = "const", season = NULL, exogen = NULL)
 varman1 <- VAR(man1, p = 4, type = "const", season = NULL, exogen = NULL)
 varserv1 <- VAR(serv1, p = 4, type = "const", season = NULL, exogen = NULL)
 
+###create tables
+irfgdp1 <- irf(vargdp1, impulse = "int", response = "pdbr", boot = T, cumulative = FALSE, n.ahead = 24, ci=0.95)
+irfagri1 <- irf(varagri1, impulse = "int", response = "agri", boot = T, cumulative = FALSE, n.ahead = 24, ci=0.95)
+irfman1 <- irf(varman1, impulse = "int", response = "man", boot = T, cumulative = FALSE, n.ahead = 24, ci=0.95)
+irfserv1 <- irf(varserv1, impulse = "int", response = "jasa", boot = T, cumulative = FALSE, n.ahead = 24, ci=0.95)
+
+irf1 <- data.frame(irfgdp1$irf$int, irfagri1$irf$int, irfman1$irf$int, irfserv1$irf$int)
 
 ############SUBSAMPLE 2###########
 gdp2 <- subset(sub2, select =
@@ -321,3 +350,19 @@ vargdp2 <- VAR(gdp2, p = 4, type = "const", season = NULL, exogen = NULL)
 varagri2 <- VAR(agri2, p = 4, type = "const", season = NULL, exogen = NULL)
 varman2 <- VAR(man2, p = 4, type = "const", season = NULL, exogen = NULL)
 varserv2 <- VAR(serv2, p = 4, type = "const", season = NULL, exogen = NULL)
+
+###create tables
+irfgdp2 <- irf(vargdp2, impulse = "int", response = "pdbr", boot = T, cumulative = FALSE, n.ahead = 24, ci=0.95)
+irfagri2 <- irf(varagri2, impulse = "int", response = "agri", boot = T, cumulative = FALSE, n.ahead = 24, ci=0.95)
+irfman2 <- irf(varman2, impulse = "int", response = "man", boot = T, cumulative = FALSE, n.ahead = 24, ci=0.95)
+irfserv2 <- irf(varserv2, impulse = "int", response = "jasa", boot = T, cumulative = FALSE, n.ahead = 24, ci=0.95)
+
+irf2 <- data.frame(irfgdp2$irf$int, irfagri2$irf$int, irfman2$irf$int, irfserv2$irf$int)
+irf12 <- cbind(irf1, irf2)
+#write_xlsx(irf12, "irfsubsample.xlsx")
+
+#######PR-nya: 1. cari cara bikin tabel statistik deskriptif 
+#######2. gabungin  irf subsample
+#######3. masukin tabel cointest
+#######4. masukin fevd
+
